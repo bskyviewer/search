@@ -1,5 +1,5 @@
 import * as React from "react";
-import { type Dispatch, type SetStateAction, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import { type SearchParams, useLangsQuery } from "store/api.ts";
 import { Controller, useForm } from "react-hook-form";
 import Select from "react-select";
@@ -8,7 +8,7 @@ import { LABELS } from "@atproto/api/src/moderation/const/labels.ts";
 import type * as AppBskyFeedDefs from "@atproto/api/src/client/types/app/bsky/feed/defs.ts";
 
 type Props = {
-  onChange: Dispatch<SetStateAction<SearchParams | null>>;
+  onChange: (params: SearchParams) => void;
 };
 
 // Default set of options; custom values can be created.
@@ -86,7 +86,6 @@ const Form: React.FC<
     dids: [] as SearchParams["dids"],
     before: undefined as SearchParams["before"],
     after: undefined as SearchParams["after"],
-    debug: false,
     excludeLabels: labelOptions,
     includeLabels: [] as typeof labelOptions,
     embeds: [] as Required<AppBskyFeedDefs.PostView>["embed"]["$type"][],
@@ -121,54 +120,47 @@ const Form: React.FC<
     // Add text search with language filters
     if (text && data.languages?.length) {
       q += `+(${data.languages.map((l) => `text_${l.value}:${text}`).join(" ")})`;
+    } else {
+      // ensure that there's at least one positive clause
+      q = "rkey:[* TO *]";
     }
 
     // Add hashtags
     if (data.hashtags.length) {
-      const hashtagsQuery = data.hashtags
-        .map((tag) => `hashtag:${tag}`)
-        .join(" ");
-      q += q ? ` ${hashtagsQuery}` : hashtagsQuery;
+      q += ` +tag:(${data.hashtags.join(" ")})`;
     }
 
     // Add tri-state filters
     if (data.isReply !== undefined) {
-      q += ` isReply:${data.isReply}`;
+      q += ` ${sign(data.isReply)}is:reply`;
     }
     if (data.hasLabel !== undefined) {
-      q += ` hasLabel:${data.hasLabel}`;
+      q += ` ${sign(data.hasLabel)}has:label`;
     }
     if (data.hasTag !== undefined) {
-      q += ` hasTag:${data.hasTag}`;
+      q += ` ${sign(data.hasTag)}has:tag`;
     }
     if (data.hasEmbed !== undefined) {
-      q += ` hasEmbed:${data.hasEmbed}`;
+      q += ` ${sign(data.hasEmbed)}has:embed`;
     }
     if (data.hasError !== undefined) {
-      q += ` hasError:${data.hasError}`;
+      q += ` ${sign(data.hasError)}has:error`;
     }
 
     // Add label filters
     if (data.excludeLabels.length) {
-      const excludeLabelsQuery = data.excludeLabels
-        .map((label) => `-label:${label.value}`)
-        .join(" ");
-      q += q ? ` ${excludeLabelsQuery}` : excludeLabelsQuery;
+      q += ` -label:(${data.excludeLabels
+        .map((label) => `"${label.value}"`)
+        .join(" ")})`;
     }
 
     if (data.includeLabels.length) {
-      const includeLabelsQuery = data.includeLabels
-        .map((label) => `label:${label.value}`)
-        .join(" ");
-      q += q ? ` ${includeLabelsQuery}` : includeLabelsQuery;
+      q += ` +label:("${data.includeLabels.map((label) => label.value).join('" "')}")`;
     }
 
     // Add embed filters
     if (data.embeds.length) {
-      const embedsQuery = data.embeds
-        .map((embed) => `embed:${embed}`)
-        .join(" ");
-      q += q ? ` ${embedsQuery}` : embedsQuery;
+      q += ` embed_type:(${data.embeds.join(" ")})`;
     }
 
     onChange({
@@ -176,9 +168,9 @@ const Form: React.FC<
       dids: data.dids,
       sort: data.sort,
       limit: 25,
-      debug: data.debug,
-      before: data.before,
-      after: data.after,
+      before: data.before && new Date(data.before).toISOString(),
+      after: data.after && new Date(data.after).toISOString(),
+      debug: false,
     });
   };
 
@@ -186,8 +178,6 @@ const Form: React.FC<
     <form onSubmit={handleSubmit(handler)} className="search-form">
       {/* Basic Search Section */}
       <div className="search-form-group">
-        <h3>Basic Search</h3>
-
         <div className="search-form-row">
           <input
             type="text"
@@ -198,77 +188,6 @@ const Form: React.FC<
           <button type="submit" className="search-button">
             Search
           </button>
-        </div>
-
-        <div className="form-field">
-          <label htmlFor="languages">Languages</label>
-          <Controller
-            name="languages"
-            control={control}
-            render={({ field }) => (
-              <Select
-                {...field}
-                id="languages"
-                onChange={(selectedOption) => field.onChange(selectedOption)}
-                options={langOptions}
-                isMulti
-                placeholder="Select languages..."
-              />
-            )}
-          />
-        </div>
-
-        <div className="form-field">
-          <label htmlFor="hashtags">Hashtags</label>
-          <Controller
-            name="hashtags"
-            control={control}
-            render={({ field }) => (
-              <CreatableSelect
-                {...field}
-                id="hashtags"
-                isMulti
-                onChange={(selected) => {
-                  const values = selected
-                    ? selected.map((item) => item.value)
-                    : [];
-                  field.onChange(values);
-                }}
-                value={field.value.map((value: string) => ({
-                  value,
-                  label: `#${value}`,
-                }))}
-                placeholder="Add hashtags..."
-              />
-            )}
-          />
-        </div>
-
-        <div className="form-field">
-          <label htmlFor="sort">Sort By</label>
-          <Controller
-            name="sort"
-            control={control}
-            render={({ field }) => (
-              <Select
-                {...field}
-                id="sort"
-                options={sortOptions}
-                isMulti
-                onChange={(selected) => {
-                  const values = selected
-                    ? selected.map((item) => item.value)
-                    : [];
-                  field.onChange(values);
-                }}
-                value={sortOptions.filter((option) =>
-                  field.value.includes(
-                    option.value as "desc" | "asc" | "relevance",
-                  ),
-                )}
-              />
-            )}
-          />
         </div>
       </div>
 
@@ -287,6 +206,79 @@ const Form: React.FC<
           {/* Filters Section */}
           <div className="search-form-group">
             <h3>Filters</h3>
+
+            <div className="form-field">
+              <label htmlFor="languages">Languages</label>
+              <Controller
+                name="languages"
+                control={control}
+                render={({ field }) => (
+                  <Select
+                    {...field}
+                    id="languages"
+                    onChange={(selectedOption) =>
+                      field.onChange(selectedOption)
+                    }
+                    options={langOptions}
+                    isMulti
+                    placeholder="Select languages..."
+                  />
+                )}
+              />
+            </div>
+
+            <div className="form-field">
+              <label htmlFor="hashtags">Hashtags</label>
+              <Controller
+                name="hashtags"
+                control={control}
+                render={({ field }) => (
+                  <CreatableSelect
+                    {...field}
+                    id="hashtags"
+                    isMulti
+                    onChange={(selected) => {
+                      const values = selected
+                        ? selected.map((item) => item.value)
+                        : [];
+                      field.onChange(values);
+                    }}
+                    value={field.value.map((value: string) => ({
+                      value,
+                      label: `#${value}`,
+                    }))}
+                    placeholder="Add hashtags..."
+                  />
+                )}
+              />
+            </div>
+
+            <div className="form-field">
+              <label htmlFor="sort">Sort By</label>
+              <Controller
+                name="sort"
+                control={control}
+                render={({ field }) => (
+                  <Select
+                    {...field}
+                    id="sort"
+                    options={sortOptions}
+                    isMulti
+                    onChange={(selected) => {
+                      const values = selected
+                        ? selected.map((item) => item.value)
+                        : [];
+                      field.onChange(values);
+                    }}
+                    value={sortOptions.filter((option) =>
+                      field.value.includes(
+                        option.value as "desc" | "asc" | "relevance",
+                      ),
+                    )}
+                  />
+                )}
+              />
+            </div>
 
             <div className="form-field">
               <TriStateToggle
@@ -454,16 +446,6 @@ const Form: React.FC<
               />
             </div>
           </div>
-
-          {/* Debug Section */}
-          <div className="search-form-group">
-            <h3>Debug</h3>
-
-            <div className="form-field-inline">
-              <input id="debug" type="checkbox" {...register("debug")} />
-              <label htmlFor="debug">Enable Debug Mode</label>
-            </div>
-          </div>
         </>
       )}
     </form>
@@ -481,6 +463,8 @@ export const SearchControls: React.FC<Props> = ({ onChange }) => {
 
   return <Form onChange={onChange} langs={langs} />;
 };
+
+const sign = (val: boolean) => (val ? "+" : "-");
 
 function langData(seen: string[] = []) {
   const defaultLangs = navigator.languages.filter((l) => seen.includes(l));

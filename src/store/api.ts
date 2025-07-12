@@ -29,7 +29,7 @@ export const apiSlice = createApi({
       SearchParams
     >({
       query: (params) => ({
-        url: "feed",
+        url: "/feed",
         method: "POST",
         body: params,
       }),
@@ -37,7 +37,7 @@ export const apiSlice = createApi({
 
     // Known languages endpoint
     langs: builder.query<{ seen: string[]; known: string[] }, void>({
-      query: () => ({ url: "langs" }),
+      query: () => ({ url: "/langs" }),
     }),
 
     // Get posts endpoint
@@ -58,9 +58,4 @@ export const apiSlice = createApi({
 });
 
 // Export the auto-generated hooks
-export const {
-  useSearchQuery,
-  useGetPostsQuery,
-  useLazyLangsQuery,
-  useLangsQuery,
-} = apiSlice;
+export const { useSearchQuery, useGetPostsQuery, useLangsQuery } = apiSlice;

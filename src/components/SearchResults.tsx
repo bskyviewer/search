@@ -1,17 +1,14 @@
-import {
-  type SearchParams,
-  useGetPostsQuery,
-  useSearchQuery,
-} from "store/api.ts";
+import { useGetPostsQuery, useSearchQuery } from "store/api.ts";
 import * as React from "react";
 import { useMemo } from "react";
 import { skipToken } from "@reduxjs/toolkit/query";
 import type * as AppBskyFeedDefs from "@atproto/api/src/client/types/app/bsky/feed/defs.ts";
 import { Post } from "components/Post.tsx";
 
-export const SearchResults: React.FC<{ query: SearchParams }> = ({ query }) => {
-  // Use RTK Query hook to fetch search results
-  const search = useSearchQuery(query);
+export const SearchResults: React.FC<{
+  query: string;
+  search: ReturnType<typeof useSearchQuery>;
+}> = ({ search, query }) => {
   const uris = useMemo(
     () => search.data?.feed?.map(({ post }) => post),
     [search.data],
@@ -41,14 +38,12 @@ export const SearchResults: React.FC<{ query: SearchParams }> = ({ query }) => {
   }
 
   if (!search.data?.feed?.length || !posts.data?.posts?.length) {
-    return (
-      <div className="no-results">No posts found matching "{query.q}"</div>
-    );
+    return <div className="no-results">No posts found matching "{query}"</div>;
   }
 
   return (
     <div className="search-results">
-      <h2>Search Results for "{query.q}"</h2>
+      <h2>Search Results for "{query}"</h2>
       <div className="results-list">
         {posts.data.posts.map((post: AppBskyFeedDefs.PostView) => (
           <Post post={post} />

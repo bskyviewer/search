@@ -82,7 +82,9 @@ export const Post: React.FC<{
           />
         ) : (
           <div className="avatar-placeholder">
-            {post.author.displayName || post.author.handle || ""}
+            {post.author.displayName ||
+              post.author.handle?.split(".bsky.social").at(0) ||
+              ""}
           </div>
         )}
         <div className="author-info">

@@ -45,12 +45,12 @@ const Censor: React.FC<React.PropsWithChildren<{ labels?: string[] }>> = ({
           </div>
         ) : (
           <div className="censored-header">
-            <span className="censored-warning">Censored content</span>
+            <span className="censored-warning">{labels.join(", ")}</span>
             <button
               className="censored-toggle"
               onClick={() => setIsVisible(false)}
             >
-              Hide content
+              Hide
             </button>
           </div>
         )}
