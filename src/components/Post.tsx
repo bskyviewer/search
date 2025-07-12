@@ -5,6 +5,7 @@ import {
   AppBskyFeedPost,
 } from "@atproto/api";
 import * as React from "react";
+import { useMemo } from "react";
 
 export type PostView = AppBskyFeedDefs.PostView | AppBskyEmbedRecord.ViewRecord;
 
@@ -48,6 +49,21 @@ export const Post: React.FC<{
   } else {
     console.error("Invalid post", post);
   }
+  const labels = useMemo(
+    () =>
+      [
+        ...new Set(
+          (
+            post.author.labels
+              ?.map((l) => l.val)
+              .filter((v) =>
+                ["porn", "sexual", "nudity", "graphic-media"].includes(v),
+              ) || []
+          ).concat(post?.labels?.map((l) => l.val) || []),
+        ),
+      ].sort((a, b) => a.localeCompare(b)),
+    [post],
+  );
 
   return (
     <div
@@ -79,7 +95,9 @@ export const Post: React.FC<{
         </div>
       </div>
       {record?.text ? <div className="post-content">{record?.text}</div> : null}
-      {"embed" in post && post.embed && <Embed embed={post.embed} />}
+      {"embed" in post && post.embed && (
+        <Embed embed={post.embed} labels={labels} />
+      )}
       {!isEmbed && (
         <div className="post-footer">
           <a

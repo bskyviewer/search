@@ -11,9 +11,9 @@ import { Video } from "components/embed/Video.tsx";
 import { External } from "components/embed/External.tsx";
 import { Post } from "components/Post.tsx";
 
-export const Embed: React.FC<Pick<AppBskyFeedDefs.PostView, "embed">> = ({
-  embed,
-}) => {
+type Props = { embed: AppBskyFeedDefs.PostView["embed"]; labels?: string[] };
+
+const Content: React.FC<Props> = ({ embed }) => {
   if (AppBskyEmbedImages.isView(embed)) {
     return <Images embed={embed} />;
   } else if (AppBskyEmbedVideo.isView(embed)) {
@@ -26,4 +26,46 @@ export const Embed: React.FC<Pick<AppBskyFeedDefs.PostView, "embed">> = ({
       return <Post post={record} />;
     }
   }
+};
+
+const Censor: React.FC<React.PropsWithChildren<{ labels?: string[] }>> = ({
+  labels,
+  children,
+}) => {
+  const [isVisible, setIsVisible] = React.useState(false);
+
+  if (labels?.length) {
+    return (
+      <div className={`censored-content ${isVisible ? "visible" : "hidden"}`}>
+        {!isVisible ? (
+          <div className="censored-overlay" onClick={() => setIsVisible(true)}>
+            <span className="censored-message">
+              Labeled with: {labels.join(", ")}. Click to show.
+            </span>
+          </div>
+        ) : (
+          <div className="censored-header">
+            <span className="censored-warning">Censored content</span>
+            <button
+              className="censored-toggle"
+              onClick={() => setIsVisible(false)}
+            >
+              Hide content
+            </button>
+          </div>
+        )}
+        <div className="censored-content-inner">{children}</div>
+      </div>
+    );
+  } else {
+    return children;
+  }
+};
+
+export const Embed: React.FC<Props> = ({ embed, labels }) => {
+  return (
+    <Censor labels={labels}>
+      <Content embed={embed} />
+    </Censor>
+  );
 };

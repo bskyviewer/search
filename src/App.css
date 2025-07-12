@@ -203,3 +203,76 @@ h1 {
     color: #333;
     text-align: left;
 }
+
+/* Censored content styles */
+.censored-content {
+    position: relative;
+    border-radius: 8px;
+    margin: 0.75rem 0;
+    overflow: hidden;
+    border: 1px solid #e1e8ed;
+}
+
+.censored-content.hidden .censored-content-inner {
+    filter: blur(50px);
+    pointer-events: none;
+    user-select: none;
+}
+
+.censored-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.7);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 10;
+    cursor: pointer;
+}
+
+.censored-message {
+    color: white;
+    font-size: 1rem;
+    padding: 1rem;
+    text-align: center;
+    background-color: rgba(29, 155, 240, 0.8);
+    border-radius: 4px;
+}
+
+.censored-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.5rem 1rem;
+    background-color: #f8f9fa;
+    border-bottom: 1px solid #e1e8ed;
+}
+
+.censored-warning {
+    color: #dc3545;
+    font-weight: bold;
+    font-size: 0.9rem;
+}
+
+.censored-toggle {
+    background-color: #dc3545;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    padding: 0.25rem 0.5rem;
+    font-size: 0.8rem;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.censored-toggle:hover {
+    background-color: #bd2130;
+}
+
+.censored-content-inner {
+    padding: 1rem;
+    transition: filter 0.3s ease;
+}
