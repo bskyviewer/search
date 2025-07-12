@@ -7,7 +7,7 @@ import {
 
 export interface SearchParams {
   q: string;
-  sort: string[];
+  sort: ("asc" | "desc" | "relevance")[];
   limit: number;
   debug: boolean;
   dids: string[];
@@ -35,6 +35,11 @@ export const apiSlice = createApi({
       }),
     }),
 
+    // Known languages endpoint
+    langs: builder.query<{ seen: string[]; known: string[] }, void>({
+      query: () => ({ url: "langs" }),
+    }),
+
     // Get posts endpoint
     getPosts: builder.query<
       AppBskyFeedGetPosts.OutputSchema,
@@ -53,4 +58,9 @@ export const apiSlice = createApi({
 });
 
 // Export the auto-generated hooks
-export const { useSearchQuery, useGetPostsQuery } = apiSlice;
+export const {
+  useSearchQuery,
+  useGetPostsQuery,
+  useLazyLangsQuery,
+  useLangsQuery,
+} = apiSlice;

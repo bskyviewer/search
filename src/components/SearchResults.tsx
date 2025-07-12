@@ -40,7 +40,7 @@ export const SearchResults: React.FC<{ query: SearchParams }> = ({ query }) => {
     );
   }
 
-  if (!posts.data?.posts?.length) {
+  if (!search.data?.feed?.length || !posts.data?.posts?.length) {
     return (
       <div className="no-results">No posts found matching "{query.q}"</div>
     );

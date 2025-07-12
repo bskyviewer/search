@@ -6,6 +6,7 @@ import {
 } from "@atproto/api";
 import * as React from "react";
 import { useMemo } from "react";
+import { LABELS } from "@atproto/api/src/moderation/const/labels.ts";
 
 export type PostView = AppBskyFeedDefs.PostView | AppBskyEmbedRecord.ViewRecord;
 
@@ -54,11 +55,8 @@ export const Post: React.FC<{
       [
         ...new Set(
           (
-            post.author.labels
-              ?.map((l) => l.val)
-              .filter((v) =>
-                ["porn", "sexual", "nudity", "graphic-media"].includes(v),
-              ) || []
+            post.author.labels?.map((l) => l.val).filter((v) => v in LABELS) ||
+            []
           ).concat(post?.labels?.map((l) => l.val) || []),
         ),
       ].sort((a, b) => a.localeCompare(b)),
