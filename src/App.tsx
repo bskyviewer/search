@@ -1,7 +1,8 @@
-import { useState, FormEvent } from "react";
+import { useState, useMemo, type FormEvent } from "react";
 import "./App.css";
 import { type SearchParams } from "./store/api";
 import { useSearchQuery, useGetPostsQuery } from "./store/api";
+import { skipToken } from "@reduxjs/toolkit/query";
 
 // Helper function to format dates in a user-friendly way
 function formatDate(dateString: string): string {
@@ -28,45 +29,46 @@ function formatDate(dateString: string): string {
 
 function SearchResults({ query }: { query: SearchParams }) {
   // Use RTK Query hook to fetch search results
-  const { data: searchData, error: searchError, isLoading: searchLoading } = useSearchQuery(query);
-
-  // Extract post URIs from search results
-  const postUris = searchData?.feed?.map(item => item.post) || [];
-
-  // Use RTK Query hook to fetch post details
-  const { data: postsData, error: postsError, isLoading: postsLoading } = useGetPostsQuery(
-    { uris: postUris },
-    { skip: postUris.length === 0 }
+  const search = useSearchQuery(query);
+  const uris = useMemo(
+    () => search.data?.feed?.map(({ post }) => post),
+    [search.data],
   );
 
+  // Use RTK Query hook to fetch post details
+  const posts = useGetPostsQuery(!uris?.length ? skipToken : { uris });
+
   // Handle loading state
-  if (searchLoading || postsLoading) {
+  if (search.isLoading || posts.isLoading) {
     return <div className="loading">Loading results...</div>;
   }
 
   // Handle errors
-  if (searchError) {
-    return <div className="no-results">Error fetching search results: {JSON.stringify(searchError)}</div>;
+  if (search.error) {
+    return (
+      <div className="no-results">
+        Error fetching search results: {JSON.stringify(search.error)}
+      </div>
+    );
+  } else if (posts.error) {
+    return (
+      <div className="no-results">
+        Error fetching posts: {JSON.stringify(posts.error)}
+      </div>
+    );
   }
 
-  if (postsError) {
-    return <div className="no-results">Error fetching posts: {JSON.stringify(postsError)}</div>;
-  }
-
-  // Handle no results
-  if (!searchData?.feed || searchData.feed.length === 0) {
-    return <div className="no-results">No results found for "{query.q}"</div>;
-  }
-
-  if (!postsData?.data?.posts || postsData.data.posts.length === 0) {
-    return <div className="no-results">No posts found matching "{query.q}"</div>;
+  if (!posts.data?.posts?.length) {
+    return (
+      <div className="no-results">No posts found matching "{query.q}"</div>
+    );
   }
 
   return (
     <div className="search-results">
       <h2>Search Results for "{query.q}"</h2>
       <div className="results-list">
-        {postsData.data.posts.map((post) => (
+        {posts.data.posts.map((post) => (
           <div key={post.uri} className="post-card">
             <div className="post-header">
               {post.author.avatar ? (
@@ -95,7 +97,7 @@ function SearchResults({ query }: { query: SearchParams }) {
               </div>
             </div>
             <div className="post-content">
-              {post.record.text || "No content available"}
+              {(post.record.text as string) || "No content available"}
             </div>
             <div className="post-footer">
               <span title={new Date(post.indexedAt).toLocaleString()}>
