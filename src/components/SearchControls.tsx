@@ -1,14 +1,17 @@
 import * as React from "react";
 import { useMemo, useState } from "react";
-import { type SearchParams, useLangsQuery } from "store/api.ts";
+import { type SearchParams, useLangsQuery, useSearchQuery } from "store/api.ts";
 import { Controller, useForm } from "react-hook-form";
 import Select from "react-select";
 import CreatableSelect from "react-select/creatable";
 import { LABELS } from "@atproto/api/src/moderation/const/labels.ts";
 import type * as AppBskyFeedDefs from "@atproto/api/src/client/types/app/bsky/feed/defs.ts";
 import { selectStyles } from "../styles/selectStyles";
+import { isEqual } from "utils/IsEqual.tsx";
+import { skipToken } from "@reduxjs/toolkit/query";
 
 type Props = {
+  params: SearchParams | null;
   onChange: (params: SearchParams) => void;
 };
 
@@ -85,7 +88,9 @@ const Form: React.FC<
   Props & {
     langs: ReturnType<typeof langData>;
   }
-> = ({ onChange, langs: [defaultLangs, langOptions] }) => {
+> = ({ params, onChange, langs: [defaultLangs, langOptions] }) => {
+  const searchResult = useSearchQuery(params || skipToken);
+
   const defaultValues = {
     text: "",
     hashtags: [] as string[],
@@ -172,7 +177,7 @@ const Form: React.FC<
       q += ` embed_type:(${data.embeds.join(" ")})`;
     }
 
-    onChange({
+    const update = {
       q: q.trim(),
       dids: data.dids,
       sort: data.sort,
@@ -180,7 +185,11 @@ const Form: React.FC<
       before: data.before && new Date(data.before).toISOString(),
       after: data.after && new Date(data.after).toISOString(),
       debug: false,
-    });
+    };
+    if (params && searchResult.isSuccess && isEqual(params, update)) {
+      searchResult.refetch();
+    }
+    onChange(update);
   };
 
   return (
@@ -468,7 +477,7 @@ const Form: React.FC<
   );
 };
 
-export const SearchControls: React.FC<Props> = ({ onChange }) => {
+const SearchControls: React.FC<Props> = ({ params, onChange }) => {
   const { data, isError } = useLangsQuery();
   const langs = useMemo(() => langData(data?.seen), [data?.seen]);
 
@@ -477,7 +486,7 @@ export const SearchControls: React.FC<Props> = ({ onChange }) => {
     return null;
   }
 
-  return <Form onChange={onChange} langs={langs} />;
+  return <Form params={params} onChange={onChange} langs={langs} />;
 };
 
 const sign = (val: boolean) => (val ? "+" : "-");
@@ -503,3 +512,5 @@ function langData(seen: string[] = []) {
     options,
   ] as const;
 }
+
+export default SearchControls;

@@ -1,14 +1,18 @@
-import { useGetPostsQuery, useSearchQuery } from "store/api.ts";
+import {
+  type SearchParams,
+  useGetPostsQuery,
+  useSearchQuery,
+} from "store/api.ts";
 import * as React from "react";
 import { useMemo } from "react";
 import { skipToken } from "@reduxjs/toolkit/query";
 import type * as AppBskyFeedDefs from "@atproto/api/src/client/types/app/bsky/feed/defs.ts";
 import { Post } from "components/Post.tsx";
 
-export const SearchResults: React.FC<{
-  query: string;
-  search: ReturnType<typeof useSearchQuery>;
-}> = ({ search, query }) => {
+const SearchResults: React.FC<{
+  query: SearchParams;
+}> = ({ query }) => {
+  const search = useSearchQuery(query);
   const uris = useMemo(
     () => search.data?.feed?.map(({ post }) => post),
     [search.data],
@@ -38,14 +42,16 @@ export const SearchResults: React.FC<{
   }
 
   if (!search.data?.feed?.length || !posts.data?.posts?.length) {
-    return <div className="no-results">No posts found matching "{query}"</div>;
+    return (
+      <div className="no-results">No posts found matching "{query.q}"</div>
+    );
   }
 
   return (
     <div className="search-results">
       <details>
         <summary>Lucene query</summary>
-        <pre>{query}</pre>
+        <pre>{query.q}</pre>
       </details>
       <div className="results-list">
         {posts.data.posts.map((post: AppBskyFeedDefs.PostView) => (
@@ -55,3 +61,5 @@ export const SearchResults: React.FC<{
     </div>
   );
 };
+
+export default SearchResults;
