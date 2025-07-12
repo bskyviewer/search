@@ -18,6 +18,13 @@ const labelOptions = Object.keys(LABELS).map((value) => ({
   label: value,
 }));
 
+const hideLabels = Object.values(LABELS)
+  .filter((v) => v.defaultSetting !== "ignore")
+  .map((v) => ({
+    value: v.identifier,
+    label: v.identifier,
+  }));
+
 // Sort options
 const sortOptions = [
   { value: "desc", label: "Newest first" },
@@ -87,7 +94,7 @@ const Form: React.FC<
     dids: [] as SearchParams["dids"],
     before: undefined as SearchParams["before"],
     after: undefined as SearchParams["after"],
-    excludeLabels: labelOptions,
+    excludeLabels: hideLabels,
     includeLabels: [] as typeof labelOptions,
     embeds: [] as Required<AppBskyFeedDefs.PostView>["embed"]["$type"][],
     // tri-state option
@@ -115,6 +122,7 @@ const Form: React.FC<
   const [showAdvanced, setShowAdvanced] = useState(false);
 
   const handler = (data: FormData) => {
+    setShowAdvanced(false);
     let q = "";
     const text = data.text.trim();
 

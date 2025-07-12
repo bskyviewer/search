@@ -61,8 +61,8 @@ h1 {
     flex-direction: column;
     width: 100%;
     max-width: 800px;
-    margin-bottom: 2rem;
     gap: 1rem;
+    margin-bottom: 1rem;
 }
 
 .search-form-row {
@@ -187,9 +187,16 @@ h1 {
     max-width: 600px;
 }
 
-.search-results h2 {
+.search-results details {
     margin-bottom: 1rem;
     color: var(--color-text-secondary);
+}
+
+.search-results pre {
+    margin-bottom: 1rem;
+    color: var(--color-text-secondary);
+    background-color: var(--color-background-secondary);
+    text-wrap: pretty;
 }
 
 .results-list {

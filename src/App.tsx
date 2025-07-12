@@ -32,7 +32,7 @@ function App() {
 
   return (
     <div className="app-container">
-      <h1>Bluesky Search</h1>
+      {!searchParams && <h1>Bluesky Search</h1>}
       <SearchControls onChange={onChange} />
       {searchParams && (
         <SearchResults search={searchResult} query={searchParams.q} />

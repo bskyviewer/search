@@ -1,7 +1,10 @@
 import type { StylesConfig } from "react-select";
 
 // Create a styles object for React-select components
-export const selectStyles: StylesConfig = {
+export const selectStyles: StylesConfig<
+  { label: string; value: string },
+  true
+> = {
   // Control styles (normal state)
   control: (base, state) => ({
     ...base,

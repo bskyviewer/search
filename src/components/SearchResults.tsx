@@ -43,10 +43,13 @@ export const SearchResults: React.FC<{
 
   return (
     <div className="search-results">
-      <h2>Search Results for "{query}"</h2>
+      <details>
+        <summary>Lucene query</summary>
+        <pre>{query}</pre>
+      </details>
       <div className="results-list">
         {posts.data.posts.map((post: AppBskyFeedDefs.PostView) => (
-          <Post post={post} />
+          <Post key={post.uri} post={post} />
         ))}
       </div>
     </div>
