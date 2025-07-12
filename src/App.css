@@ -18,9 +18,81 @@ h1 {
 
 .search-form {
     display: flex;
+    flex-direction: column;
     width: 100%;
-    max-width: 600px;
+    max-width: 800px;
     margin-bottom: 2rem;
+    gap: 1rem;
+}
+
+.search-form-row {
+    display: flex;
+    gap: 1rem;
+    width: 100%;
+}
+
+.search-form-group {
+    border: 1px solid #e1e8ed;
+    border-radius: 8px;
+    padding: 1rem;
+    margin-bottom: 1rem;
+    background-color: #f8f9fa;
+}
+
+.search-form-group h3 {
+    margin-top: 0;
+    margin-bottom: 1rem;
+    color: #1d9bf0;
+    font-size: 1.1rem;
+}
+
+.form-field {
+    margin-bottom: 1rem;
+    width: 100%;
+}
+
+.form-field label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-weight: 500;
+    color: #333;
+}
+
+.form-field-inline {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 0.5rem;
+}
+
+.form-field-inline label {
+    margin-bottom: 0;
+}
+
+.checkbox-group {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+}
+
+.tri-state-toggle {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.tri-state-option {
+    padding: 0.25rem 0.5rem;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    cursor: pointer;
+    background-color: white;
+}
+
+.tri-state-option.selected {
+    background-color: #1d9bf0;
+    color: white;
+    border-color: #1d9bf0;
 }
 
 .search-input {
@@ -28,8 +100,14 @@ h1 {
     padding: 0.75rem 1rem;
     font-size: 1rem;
     border: 1px solid #ccc;
-    border-radius: 4px 0 0 4px;
+    border-radius: 4px;
     outline: none;
+    width: 100%;
+}
+
+/* Style for the main search input in the basic search form */
+.search-form-row .search-input {
+    border-radius: 4px 0 0 4px;
 }
 
 .search-input:focus {
@@ -42,9 +120,14 @@ h1 {
     color: white;
     font-size: 1rem;
     border: none;
-    border-radius: 0 4px 4px 0;
+    border-radius: 4px;
     cursor: pointer;
     transition: background-color 0.2s;
+}
+
+/* Style for the search button in the basic search form */
+.search-form-row .search-button {
+    border-radius: 0 4px 4px 0;
 }
 
 .search-button:hover {
@@ -275,4 +358,47 @@ h1 {
 .censored-content-inner {
     padding: 1rem;
     transition: filter 0.3s ease;
+}
+
+/* Checkbox styles */
+input[type="checkbox"] {
+    width: 18px;
+    height: 18px;
+    margin-right: 8px;
+    cursor: pointer;
+}
+
+/* Datetime input styles */
+input[type="datetime-local"] {
+    padding: 0.75rem 1rem;
+    font-size: 1rem;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    outline: none;
+    width: 100%;
+}
+
+input[type="datetime-local"]:focus {
+    border-color: #1d9bf0;
+}
+
+/* React-select custom styles */
+.css-13cymwt-control {
+    border-color: #ccc !important;
+    box-shadow: none !important;
+    min-height: 42px !important;
+}
+
+.css-13cymwt-control:hover {
+    border-color: #1d9bf0 !important;
+}
+
+.css-t3ipsp-control {
+    border-color: #1d9bf0 !important;
+    box-shadow: 0 0 0 1px #1d9bf0 !important;
+    min-height: 42px !important;
+}
+
+.css-1nmdiq5-menu {
+    z-index: 10 !important;
 }
