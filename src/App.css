@@ -1,3 +1,43 @@
+:root {
+    /* Light mode (default) */
+    --color-primary: #1d9bf0;
+    --color-primary-hover: #0c7abf;
+    --color-text-primary: #333;
+    --color-text-secondary: #657786;
+    --color-background: #ffffff;
+    --color-background-secondary: #f8f9fa;
+    --color-border: #e1e8ed;
+    --color-shadow: rgba(0, 0, 0, 0.05);
+    --color-shadow-hover: rgba(0, 0, 0, 0.1);
+    --color-danger: #dc3545;
+    --color-danger-hover: #bd2130;
+    --color-overlay: rgba(0, 0, 0, 0.7);
+}
+
+@media (prefers-color-scheme: dark) {
+    :root {
+        /* Dark mode */
+        --color-primary: #1a8cd8;
+        --color-primary-hover: #1d9bf0;
+        --color-text-primary: #e6e9ea;
+        --color-text-secondary: #8b98a5;
+        --color-background: #15202b;
+        --color-background-secondary: #1e2732;
+        --color-border: #38444d;
+        --color-shadow: rgba(0, 0, 0, 0.2);
+        --color-shadow-hover: rgba(0, 0, 0, 0.3);
+        --color-danger: #e05260;
+        --color-danger-hover: #dc3545;
+        --color-overlay: rgba(0, 0, 0, 0.8);
+    }
+}
+
+body {
+    background-color: var(--color-background);
+    color: var(--color-text-primary);
+    transition: background-color 0.3s ease, color 0.3s ease;
+}
+
 #root {
     max-width: 1280px;
     margin: 0 auto;
@@ -12,7 +52,7 @@
 }
 
 h1 {
-    color: #1d9bf0;
+    color: var(--color-primary);
     margin-bottom: 1.5rem;
 }
 
@@ -32,17 +72,17 @@ h1 {
 }
 
 .search-form-group {
-    border: 1px solid #e1e8ed;
+    border: 1px solid var(--color-border);
     border-radius: 8px;
     padding: 1rem;
     margin-bottom: 1rem;
-    background-color: #f8f9fa;
+    background-color: var(--color-background-secondary);
 }
 
 .search-form-group h3 {
     margin-top: 0;
     margin-bottom: 1rem;
-    color: #1d9bf0;
+    color: var(--color-primary);
     font-size: 1.1rem;
 }
 
@@ -55,7 +95,7 @@ h1 {
     display: block;
     margin-bottom: 0.5rem;
     font-weight: 500;
-    color: #333;
+    color: var(--color-text-primary);
 }
 
 .form-field-inline {
@@ -83,26 +123,28 @@ h1 {
 
 .tri-state-option {
     padding: 0.25rem 0.5rem;
-    border: 1px solid #ccc;
+    border: 1px solid var(--color-border);
     border-radius: 4px;
     cursor: pointer;
-    background-color: white;
+    background-color: var(--color-background);
 }
 
 .tri-state-option.selected {
-    background-color: #1d9bf0;
+    background-color: var(--color-primary);
     color: white;
-    border-color: #1d9bf0;
+    border-color: var(--color-primary);
 }
 
 .search-input {
     flex: 1;
     padding: 0.75rem 1rem;
     font-size: 1rem;
-    border: 1px solid #ccc;
+    border: 1px solid var(--color-border);
     border-radius: 4px;
     outline: none;
     width: 100%;
+    background-color: var(--color-background);
+    color: var(--color-text-primary);
 }
 
 /* Style for the main search input in the basic search form */
@@ -111,12 +153,12 @@ h1 {
 }
 
 .search-input:focus {
-    border-color: #1d9bf0;
+    border-color: var(--color-primary);
 }
 
 .search-button {
     padding: 0.75rem 1.5rem;
-    background-color: #1d9bf0;
+    background-color: var(--color-primary);
     color: white;
     font-size: 1rem;
     border: none;
@@ -131,12 +173,12 @@ h1 {
 }
 
 .search-button:hover {
-    background-color: #0c7abf;
+    background-color: var(--color-primary-hover);
 }
 
 .loading {
     font-size: 1.2rem;
-    color: #666;
+    color: var(--color-text-secondary);
     margin: 2rem 0;
 }
 
@@ -147,7 +189,7 @@ h1 {
 
 .search-results h2 {
     margin-bottom: 1rem;
-    color: #333;
+    color: var(--color-text-primary);
 }
 
 .results-list {
@@ -157,26 +199,26 @@ h1 {
 }
 
 .post-card {
-    border: 1px solid #e1e8ed;
+    border: 1px solid var(--color-border);
     border-radius: 8px;
     padding: 1rem;
-    background-color: white;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+    background-color: var(--color-background);
+    box-shadow: 0 2px 5px var(--color-shadow);
     transition: box-shadow 0.2s;
 }
 
 .post-card-embedded {
     margin-top: 0.75rem;
-    border: 1px solid #e1e8ed;
+    border: 1px solid var(--color-border);
     border-radius: 8px;
     padding: 1rem;
-    background-color: white;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+    background-color: var(--color-background);
+    box-shadow: 0 2px 5px var(--color-shadow);
     transition: box-shadow 0.2s;
 }
 
 .post-card:hover {
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 4px 10px var(--color-shadow-hover);
 }
 
 .post-header {
@@ -200,17 +242,17 @@ h1 {
 
 .display-name {
     font-weight: bold;
-    color: #333;
+    color: var(--color-text-primary);
 }
 
 .handle {
-    color: #657786;
+    color: var(--color-text-secondary);
     font-size: 0.9rem;
 }
 
 .post-content {
     line-height: 1.4;
-    color: #333;
+    color: var(--color-text-primary);
     text-align: left;
 }
 
@@ -218,7 +260,7 @@ h1 {
     margin-top: 0.75rem;
     display: flex;
     gap: 1rem;
-    color: #657786;
+    color: var(--color-text-secondary);
     font-size: 0.9rem;
 }
 
@@ -226,7 +268,7 @@ h1 {
     width: 48px;
     height: 48px;
     border-radius: 50%;
-    background-color: #1d9bf0;
+    background-color: var(--color-primary);
     color: white;
     display: flex;
     align-items: center;
@@ -239,11 +281,11 @@ h1 {
 .no-results {
     text-align: center;
     padding: 2rem;
-    color: #657786;
+    color: var(--color-text-secondary);
     font-size: 1.2rem;
-    background-color: #f8f9fa;
+    background-color: var(--color-background-secondary);
     border-radius: 8px;
-    border: 1px dashed #e1e8ed;
+    border: 1px dashed var(--color-border);
     margin-top: 1rem;
 }
 
@@ -283,7 +325,7 @@ h1 {
 .post-external-content {
     margin-bottom: 0.75rem;
     line-height: 1.4;
-    color: #333;
+    color: var(--color-text-primary);
     text-align: left;
 }
 
@@ -293,7 +335,7 @@ h1 {
     border-radius: 8px;
     margin: 0.75rem 0;
     overflow: hidden;
-    border: 1px solid #e1e8ed;
+    border: 1px solid var(--color-border);
 }
 
 .censored-content.hidden .censored-content-inner {
@@ -308,7 +350,7 @@ h1 {
     left: 0;
     width: 100%;
     height: 100%;
-    background-color: rgba(0, 0, 0, 0.7);
+    background-color: var(--color-overlay);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -321,7 +363,8 @@ h1 {
     font-size: 1rem;
     padding: 1rem;
     text-align: center;
-    background-color: rgba(29, 155, 240, 0.8);
+    background-color: var(--color-primary);
+    opacity: 0.9;
     border-radius: 4px;
 }
 
@@ -330,18 +373,18 @@ h1 {
     justify-content: space-between;
     align-items: center;
     padding: 0.5rem 1rem;
-    background-color: #f8f9fa;
-    border-bottom: 1px solid #e1e8ed;
+    background-color: var(--color-background-secondary);
+    border-bottom: 1px solid var(--color-border);
 }
 
 .censored-warning {
-    color: #dc3545;
+    color: var(--color-danger);
     font-weight: bold;
     font-size: 0.9rem;
 }
 
 .censored-toggle {
-    background-color: #dc3545;
+    background-color: var(--color-danger);
     color: white;
     border: none;
     border-radius: 4px;
@@ -352,7 +395,7 @@ h1 {
 }
 
 .censored-toggle:hover {
-    background-color: #bd2130;
+    background-color: var(--color-danger-hover);
 }
 
 .censored-content-inner {
@@ -372,34 +415,63 @@ input[type="checkbox"] {
 input[type="datetime-local"] {
     padding: 0.75rem 1rem;
     font-size: 1rem;
-    border: 1px solid #ccc;
+    border: 1px solid var(--color-border);
     border-radius: 4px;
     outline: none;
     width: 100%;
     box-sizing: border-box;
+    background-color: var(--color-background);
+    color: var(--color-text-primary);
 }
 
 input[type="datetime-local"]:focus {
-    border-color: #1d9bf0;
+    border-color: var(--color-primary);
 }
 
 /* React-select custom styles */
 .css-13cymwt-control {
-    border-color: #ccc !important;
+    border-color: var(--color-border) !important;
     box-shadow: none !important;
     min-height: 42px !important;
+    background-color: var(--color-background) !important;
 }
 
 .css-13cymwt-control:hover {
-    border-color: #1d9bf0 !important;
+    border-color: var(--color-primary) !important;
 }
 
 .css-t3ipsp-control {
-    border-color: #1d9bf0 !important;
-    box-shadow: 0 0 0 1px #1d9bf0 !important;
+    border-color: var(--color-primary) !important;
+    box-shadow: 0 0 0 1px var(--color-primary) !important;
     min-height: 42px !important;
+    background-color: var(--color-background) !important;
 }
 
 .css-1nmdiq5-menu {
     z-index: 10 !important;
+    background-color: var(--color-background) !important;
+    color: var(--color-text-primary) !important;
+    border-color: var(--color-border) !important;
+}
+
+/* Additional styles for React-select in dark mode */
+.css-1dimb5e-singleValue, .css-qc6sy-singleValue {
+    color: var(--color-text-primary) !important;
+}
+
+.css-166bipr-Input, .css-6j8wv5-Input, .css-1wa3eu0-placeholder {
+    color: var(--color-text-primary) !important;
+}
+
+.css-1pndypt-Input > input, .css-6j8wv5-Input > input {
+    color: var(--color-text-primary) !important;
+}
+
+.css-1n6sfyn-MenuList > div {
+    background-color: var(--color-background) !important;
+    color: var(--color-text-primary) !important;
+}
+
+.css-1n6sfyn-MenuList > div:hover {
+    background-color: var(--color-background-secondary) !important;
 }
