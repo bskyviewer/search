@@ -6,6 +6,7 @@ import Select from "react-select";
 import CreatableSelect from "react-select/creatable";
 import { LABELS } from "@atproto/api/src/moderation/const/labels.ts";
 import type * as AppBskyFeedDefs from "@atproto/api/src/client/types/app/bsky/feed/defs.ts";
+import { selectStyles } from "../styles/selectStyles";
 
 type Props = {
   onChange: (params: SearchParams) => void;
@@ -222,6 +223,7 @@ const Form: React.FC<
                     options={langOptions}
                     isMulti
                     placeholder="Select languages..."
+                    styles={selectStyles}
                   />
                 )}
               />
@@ -248,6 +250,7 @@ const Form: React.FC<
                       label: `#${value}`,
                     }))}
                     placeholder="Add hashtags..."
+                    styles={selectStyles}
                   />
                 )}
               />
@@ -275,6 +278,7 @@ const Form: React.FC<
                         option.value as "desc" | "asc" | "relevance",
                       ),
                     )}
+                    styles={selectStyles}
                   />
                 )}
               />
@@ -337,6 +341,7 @@ const Form: React.FC<
                     options={labelOptions}
                     isMulti
                     placeholder="Select labels to exclude..."
+                    styles={selectStyles}
                   />
                 )}
               />
@@ -354,6 +359,7 @@ const Form: React.FC<
                     options={labelOptions}
                     isMulti
                     placeholder="Select labels to include..."
+                    styles={selectStyles}
                   />
                 )}
               />
@@ -385,6 +391,7 @@ const Form: React.FC<
                       field.value.includes(option.value),
                     )}
                     placeholder="Select embed types..."
+                    styles={selectStyles}
                   />
                 )}
               />
@@ -416,6 +423,7 @@ const Form: React.FC<
                       label: value,
                     }))}
                     placeholder="Enter user DIDs..."
+                    styles={selectStyles}
                   />
                 )}
               />
