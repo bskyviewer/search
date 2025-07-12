@@ -1,7 +1,7 @@
 import { use, useMemo } from "react";
 import { AppBskyFeedGetFeedSkeleton, AtpAgent } from "@atproto/api";
 
-interface IndexParams {
+export interface SearchParams {
   q: string;
   sort: string[];
   limit: number;
@@ -13,18 +13,28 @@ interface IndexParams {
 
 const agent = new AtpAgent({ service: "https://bsky.social" });
 
-export function useSearch(query: IndexParams) {
-  const promise = useMemo(
-    () =>
-      fetch("https://indexer-hp2l.onrender.com/feed", {
+export function useSearch(query: SearchParams) {
+  const promise = useMemo(async () => {
+    try {
+      return await fetch("http://localhost:8080/feed", {
         method: "POST",
         body: JSON.stringify(query),
-      }),
-    [query],
-  );
-  const skeleton = use(promise.then((res) => res.json()));
+        headers: {
+          "Content-Type": "application/json",
+        },
+      }).then((res) => (res.ok ? res.json() : {}));
+    } catch (e) {
+      console.log(e);
+      return {};
+    }
+  }, [query]);
+  const skeleton = use(promise) as AppBskyFeedGetFeedSkeleton.OutputSchema;
+  console.log(skeleton);
   const posts = useMemo(
-    () => skeleton && agent.getPosts({ uris: skeleton.uris }),
+    () =>
+      skeleton.feed
+        ? agent.getPosts({ uris: skeleton.feed.map((p) => p.post) })
+        : {},
     [skeleton],
   );
   return use(posts);
