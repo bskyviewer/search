@@ -1,6 +1,7 @@
-import { useState, FormEvent, Suspense } from "react";
+import { useState, FormEvent } from "react";
 import "./App.css";
-import { type SearchParams, useSearch } from "./api.ts";
+import { type SearchParams } from "./store/api";
+import { useSearchQuery, useGetPostsQuery } from "./store/api";
 
 // Helper function to format dates in a user-friendly way
 function formatDate(dateString: string): string {
@@ -25,22 +26,47 @@ function formatDate(dateString: string): string {
   }
 }
 
-function SearchResults(query: SearchParams) {
-  const searchResults = useSearch(query);
+function SearchResults({ query }: { query: SearchParams }) {
+  // Use RTK Query hook to fetch search results
+  const { data: searchData, error: searchError, isLoading: searchLoading } = useSearchQuery(query);
 
-  if (!searchResults || !searchResults.data || !searchResults.data.posts) {
-    return <div className="no-results">No results found for "{query}"</div>;
+  // Extract post URIs from search results
+  const postUris = searchData?.feed?.map(item => item.post) || [];
+
+  // Use RTK Query hook to fetch post details
+  const { data: postsData, error: postsError, isLoading: postsLoading } = useGetPostsQuery(
+    { uris: postUris },
+    { skip: postUris.length === 0 }
+  );
+
+  // Handle loading state
+  if (searchLoading || postsLoading) {
+    return <div className="loading">Loading results...</div>;
   }
 
-  if (searchResults.data.posts.length === 0) {
-    return <div className="no-results">No posts found matching "{query}"</div>;
+  // Handle errors
+  if (searchError) {
+    return <div className="no-results">Error fetching search results: {JSON.stringify(searchError)}</div>;
+  }
+
+  if (postsError) {
+    return <div className="no-results">Error fetching posts: {JSON.stringify(postsError)}</div>;
+  }
+
+  // Handle no results
+  if (!searchData?.feed || searchData.feed.length === 0) {
+    return <div className="no-results">No results found for "{query.q}"</div>;
+  }
+
+  if (!postsData?.data?.posts || postsData.data.posts.length === 0) {
+    return <div className="no-results">No posts found matching "{query.q}"</div>;
   }
 
   return (
     <div className="search-results">
-      <h2>Search Results for "{query}"</h2>
+      <h2>Search Results for "{query.q}"</h2>
       <div className="results-list">
-        {searchResults.data.posts.map((post) => (
+        {postsData.data.posts.map((post) => (
           <div key={post.uri} className="post-card">
             <div className="post-header">
               {post.author.avatar ? (
@@ -88,17 +114,19 @@ function SearchResults(query: SearchParams) {
 
 function App() {
   const [query, setQuery] = useState("");
-  const [searchTerm, setSearchTerm] = useState({
-    q: "",
-    sort: ["relevance"],
-    limit: 20,
-    debug: false,
-    dids: [],
-  });
+  const [searchParams, setSearchParams] = useState<SearchParams | null>(null);
 
   const handleSubmit = (e: FormEvent) => {
     e.preventDefault();
-    setSearchTerm((s) => ({ ...s, q: query }));
+    if (query.trim()) {
+      setSearchParams({
+        q: query,
+        sort: ["relevance"],
+        limit: 20,
+        debug: false,
+        dids: [],
+      });
+    }
   };
 
   return (
@@ -117,11 +145,7 @@ function App() {
         </button>
       </form>
 
-      {searchTerm && (
-        <Suspense fallback={<div className="loading">Loading results...</div>}>
-          <SearchResults query={searchTerm} />
-        </Suspense>
-      )}
+      {searchParams && <SearchResults query={searchParams} />}
     </div>
   );
 }
