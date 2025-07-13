@@ -1,12 +1,15 @@
 import { configureStore } from '@reduxjs/toolkit';
 import { setupListeners } from '@reduxjs/toolkit/query';
 import { apiSlice } from './api';
+import searchReducer from './searchSlice';
 
 // Configure the store
 export const store = configureStore({
   reducer: {
     // Add the API slice reducer
     [apiSlice.reducerPath]: apiSlice.reducer,
+    // Add the search slice reducer
+    search: searchReducer,
   },
   // Add the API middleware to enable caching, invalidation, polling, etc.
   middleware: (getDefaultMiddleware) =>
