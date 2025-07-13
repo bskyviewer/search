@@ -9,6 +9,8 @@ import type * as AppBskyFeedDefs from "@atproto/api/src/client/types/app/bsky/fe
 import { selectStyles } from "../styles/selectStyles";
 import { isEqual } from "utils/IsEqual.tsx";
 import { skipToken } from "@reduxjs/toolkit/query";
+import { useAppDispatch, useAppSelector } from "store/hooks.ts";
+import { setSearchParams } from "store/searchSlice.ts";
 
 type Props = {
   params: SearchParams | null;
@@ -477,16 +479,27 @@ const Form: React.FC<
   );
 };
 
-const SearchControls: React.FC<Props> = ({ params, onChange }) => {
+const SearchControls: React.FC = () => {
   const { data, isError } = useLangsQuery();
   const langs = useMemo(() => langData(data?.seen), [data?.seen]);
+  const searchParams = useAppSelector((state) => state.search.searchParams);
+  const dispatch = useAppDispatch();
+
+  const onChange = (params: SearchParams | null) => {
+    dispatch(setSearchParams(params));
+  };
 
   // Wait until data is loaded before rendering form, so that defaults are initialized as expected
   if (!langs[1].length && !isError) {
     return null;
   }
 
-  return <Form params={params} onChange={onChange} langs={langs} />;
+  return (
+    <>
+      {!searchParams && <h1>Bluesky Search</h1>}{" "}
+      <Form langs={langs} params={searchParams} onChange={onChange} />
+    </>
+  );
 };
 
 const sign = (val: boolean) => (val ? "+" : "-");
