@@ -5,13 +5,17 @@ import { Controller, useForm } from "react-hook-form";
 import Select from "react-select";
 import CreatableSelect from "react-select/creatable";
 import { LABELS } from "@atproto/api/src/moderation/const/labels.ts";
-import type * as AppBskyFeedDefs from "@atproto/api/src/client/types/app/bsky/feed/defs.ts";
-import { selectStyles } from "../styles/selectStyles";
+import {
+  multiSelectStyles,
+  singleSelectStyles,
+} from "styles/multiSelectStyles.ts";
 import { isEqual } from "utils/IsEqual.tsx";
 import { skipToken } from "@reduxjs/toolkit/query";
 import { useAppDispatch, useAppSelector } from "store/hooks.ts";
-import { updateSearchFromForm, type SearchFormData } from "store/searchSlice.ts";
-
+import {
+  type SearchFormData,
+  updateSearchFromForm,
+} from "store/searchSlice.ts";
 
 // Default set of options; custom values can be created.
 const labelOptions = Object.keys(LABELS).map((value) => ({
@@ -83,9 +87,9 @@ const TriStateToggle: React.FC<{
 };
 
 const Form: React.FC<{
-    langs: ReturnType<typeof langData>;
-    params: SearchParams | null;
-  }> = ({ params, langs: [defaultLangs, langOptions] }) => {
+  langs: ReturnType<typeof langData>;
+  params: SearchParams | null;
+}> = ({ params, langs: [defaultLangs, langOptions] }) => {
   const searchResult = useSearchQuery(params || skipToken);
   const dispatch = useAppDispatch();
 
@@ -93,19 +97,13 @@ const Form: React.FC<{
     text: "",
     hashtags: [] as string[],
     languages: defaultLangs,
-    sort: ["desc"] as SearchParams["sort"],
-    dids: [] as SearchParams["dids"],
-    before: undefined as SearchParams["before"],
-    after: undefined as SearchParams["after"],
+    sort: "desc",
+    dids: [],
+    before: undefined,
+    after: undefined,
     excludeLabels: hideLabels,
     includeLabels: [] as typeof labelOptions,
-    embeds: [] as Required<AppBskyFeedDefs.PostView>["embed"]["$type"][],
-    // tri-state option
-    isReply: undefined as boolean | undefined,
-    hasLabel: undefined as boolean | undefined,
-    hasTag: undefined as boolean | undefined,
-    hasEmbed: undefined as boolean | undefined,
-    hasError: undefined as boolean | undefined,
+    embeds: [],
   };
 
   const { register, control, handleSubmit, watch, setValue } =
@@ -133,7 +131,7 @@ const Form: React.FC<{
       const newParams = {
         q: "", // This will be filled by the updateSearchFromForm action
         dids: data.dids,
-        sort: data.sort,
+        sort: [data.sort],
         limit: 25,
         before: data.before && new Date(data.before).toISOString(),
         after: data.after && new Date(data.after).toISOString(),
@@ -194,7 +192,7 @@ const Form: React.FC<{
                     options={langOptions}
                     isMulti
                     placeholder="Select languages..."
-                    styles={selectStyles}
+                    styles={multiSelectStyles}
                   />
                 )}
               />
@@ -221,7 +219,7 @@ const Form: React.FC<{
                       label: `#${value}`,
                     }))}
                     placeholder="Add hashtags..."
-                    styles={selectStyles}
+                    styles={multiSelectStyles}
                   />
                 )}
               />
@@ -237,19 +235,13 @@ const Form: React.FC<{
                     {...field}
                     id="sort"
                     options={sortOptions}
-                    isMulti
-                    onChange={(selected) => {
-                      const values = selected
-                        ? selected.map((item) => item.value)
-                        : [];
-                      field.onChange(values);
-                    }}
-                    value={sortOptions.filter((option) =>
-                      field.value.includes(
-                        option.value as "desc" | "asc" | "relevance",
-                      ),
+                    onChange={(selectedOption) =>
+                      selectedOption && field.onChange(selectedOption.value)
+                    }
+                    value={sortOptions.find(
+                      ({ value }) => field.value === value,
                     )}
-                    styles={selectStyles}
+                    styles={singleSelectStyles}
                   />
                 )}
               />
@@ -312,7 +304,7 @@ const Form: React.FC<{
                     options={labelOptions}
                     isMulti
                     placeholder="Select labels to exclude..."
-                    styles={selectStyles}
+                    styles={multiSelectStyles}
                   />
                 )}
               />
@@ -330,7 +322,7 @@ const Form: React.FC<{
                     options={labelOptions}
                     isMulti
                     placeholder="Select labels to include..."
-                    styles={selectStyles}
+                    styles={multiSelectStyles}
                   />
                 )}
               />
@@ -362,7 +354,7 @@ const Form: React.FC<{
                       field.value.includes(option.value),
                     )}
                     placeholder="Select embed types..."
-                    styles={selectStyles}
+                    styles={multiSelectStyles}
                   />
                 )}
               />
@@ -394,7 +386,7 @@ const Form: React.FC<{
                       label: value,
                     }))}
                     placeholder="Enter user DIDs..."
-                    styles={selectStyles}
+                    styles={multiSelectStyles}
                   />
                 )}
               />
@@ -448,7 +440,6 @@ const SearchControls: React.FC = () => {
     </>
   );
 };
-
 
 function langData(seen: string[] = []) {
   const defaultLangs = navigator.languages.filter((l) => seen.includes(l));

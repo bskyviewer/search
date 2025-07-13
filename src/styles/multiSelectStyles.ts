@@ -1,10 +1,6 @@
 import type { StylesConfig } from "react-select";
 
-// Create a styles object for React-select components
-export const selectStyles: StylesConfig<
-  { label: string; value: string },
-  true
-> = {
+const selectStyles: StylesConfig<{ label: string; value: string }> = {
   // Control styles (normal state)
   control: (base, state) => ({
     ...base,
@@ -28,26 +24,6 @@ export const selectStyles: StylesConfig<
     backgroundColor: "var(--color-background)",
     color: "var(--color-text-primary)",
     borderColor: "var(--color-border)",
-  }),
-
-  // Single value styles
-  singleValue: (base) => ({
-    ...base,
-    color: "var(--color-text-primary)",
-  }),
-
-  // Multi value styles
-  multiValue: (base) => ({
-    ...base,
-    color: "var(--color-text-secondary)",
-    backgroundColor: "var(--color-background-secondary)",
-  }),
-
-  // Multi value styles
-  multiValueLabel: (base) => ({
-    ...base,
-    color: "var(--color-text-primary)",
-    backgroundColor: "var(--color-background-secondary)",
   }),
 
   // Input styles
@@ -87,5 +63,38 @@ export const selectStyles: StylesConfig<
     "&:hover": {
       backgroundColor: "var(--color-background-secondary)",
     },
+  }),
+};
+
+// Create a styles object for React-select components
+export const singleSelectStyles: StylesConfig<
+  { label: string; value: string },
+  false
+> = {
+  ...selectStyles,
+
+  singleValue: (base) => ({
+    ...base,
+    color: "var(--color-text-primary)",
+  }),
+};
+
+// Create a styles object for React-select components
+export const multiSelectStyles: StylesConfig<
+  { label: string; value: string },
+  true
+> = {
+  ...selectStyles,
+
+  multiValue: (base) => ({
+    ...base,
+    color: "var(--color-text-secondary)",
+    backgroundColor: "var(--color-background-secondary)",
+  }),
+
+  multiValueLabel: (base) => ({
+    ...base,
+    color: "var(--color-text-primary)",
+    backgroundColor: "var(--color-background-secondary)",
   }),
 };

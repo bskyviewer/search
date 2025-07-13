@@ -10,18 +10,18 @@ export interface SearchFormData {
   text: string;
   hashtags: string[];
   languages: { value: string; label: string }[];
-  sort: SearchParams["sort"];
+  sort: SearchParams["sort"][number];
   dids: SearchParams["dids"];
-  before: SearchParams["before"];
-  after: SearchParams["after"];
+  before?: SearchParams["before"];
+  after?: SearchParams["after"];
   excludeLabels: { value: string; label: string }[];
   includeLabels: { value: string; label: string }[];
   embeds: string[];
-  isReply: boolean | undefined;
-  hasLabel: boolean | undefined;
-  hasTag: boolean | undefined;
-  hasEmbed: boolean | undefined;
-  hasError: boolean | undefined;
+  isReply?: boolean;
+  hasLabel?: boolean;
+  hasTag?: boolean;
+  hasEmbed?: boolean;
+  hasError?: boolean;
 }
 
 const initialState: SearchState = {
@@ -89,7 +89,7 @@ export const searchSlice = createSlice({
       state.searchParams = {
         q: q.trim(),
         dids: data.dids,
-        sort: data.sort,
+        sort: [data.sort],
         limit: 25,
         before: data.before && new Date(data.before).toISOString(),
         after: data.after && new Date(data.after).toISOString(),
