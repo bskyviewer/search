@@ -155,21 +155,22 @@ const Form: React.FC<{
             className="search-input"
             {...register("text")}
           />
+
           <button type="submit" className="search-button">
             Search
           </button>
+
+          {/* Toggle for Advanced Options */}
+          <button
+            type="button"
+            className="search-button"
+            style={{ alignSelf: "flex-start" }}
+            onClick={() => setShowAdvanced(!showAdvanced)}
+          >
+            {showAdvanced ? "Hide" : "Advanced..."}
+          </button>
         </div>
       </div>
-
-      {/* Toggle for Advanced Options */}
-      <button
-        type="button"
-        className="search-button"
-        style={{ alignSelf: "flex-start" }}
-        onClick={() => setShowAdvanced(!showAdvanced)}
-      >
-        {showAdvanced ? "Hide Advanced Options" : "Show Advanced Options"}
-      </button>
 
       {showAdvanced && (
         <>
