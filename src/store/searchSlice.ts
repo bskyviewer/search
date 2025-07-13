@@ -83,7 +83,7 @@ export const searchSlice = createSlice({
 
       // Add embed filters
       if (data.embeds.length) {
-        q += ` embed_type:(${data.embeds.join(" ")})`;
+        q += ` +embed_type:(${data.embeds.join(" ")})`;
       }
 
       state.searchParams = {
