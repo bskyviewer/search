@@ -266,7 +266,7 @@ const Form: React.FC<{
 
             <div className="form-field">
               <TriStateToggle
-                label="Has Tag"
+                label="Has Hashtag"
                 value={hasTag}
                 onChange={(value) => setValue("hasTag", value)}
               />

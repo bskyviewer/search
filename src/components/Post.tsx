@@ -82,8 +82,17 @@ export const Post: React.FC<{
           />
         ) : (
           <div className="avatar-placeholder">
-            {post.author.displayName ||
-              post.author.handle?.split(".bsky.social").at(0) ||
+            {post.author.displayName || (
+                <>
+                  {post.author.handle?.split(".").map((v, i) => (
+                    <React.Fragment key={i}>
+                      {i !== 0 ? "." : ""}
+                      {v}
+                      <wbr />
+                    </React.Fragment>
+                  ))}
+                </>
+              ) ||
               ""}
           </div>
         )}
@@ -110,6 +119,9 @@ export const Post: React.FC<{
           <span title="Likes">❤️ {post.likeCount || 0}</span>
           <span title="Reposts">🔄 {post.repostCount || 0}</span>
           <span title="Replies">💬 {post.replyCount || 0}</span>
+          <span title="Tags">
+            {record?.tags?.map((t) => <span key={t}>#{t}</span>) || 0}
+          </span>
         </div>
       )}
     </div>
