@@ -9,11 +9,9 @@ import type * as AppBskyFeedDefs from "@atproto/api/src/client/types/app/bsky/fe
 import { selectStyles } from "../styles/selectStyles";
 import { isEqual } from "utils/IsEqual.tsx";
 import { skipToken } from "@reduxjs/toolkit/query";
+import { useAppDispatch, useAppSelector } from "store/hooks.ts";
+import { updateSearchFromForm, type SearchFormData } from "store/searchSlice.ts";
 
-type Props = {
-  params: SearchParams | null;
-  onChange: (params: SearchParams) => void;
-};
 
 // Default set of options; custom values can be created.
 const labelOptions = Object.keys(LABELS).map((value) => ({
@@ -84,14 +82,14 @@ const TriStateToggle: React.FC<{
   );
 };
 
-const Form: React.FC<
-  Props & {
+const Form: React.FC<{
     langs: ReturnType<typeof langData>;
-  }
-> = ({ params, onChange, langs: [defaultLangs, langOptions] }) => {
+    params: SearchParams | null;
+  }> = ({ params, langs: [defaultLangs, langOptions] }) => {
   const searchResult = useSearchQuery(params || skipToken);
+  const dispatch = useAppDispatch();
 
-  const defaultValues = {
+  const defaultValues: SearchFormData = {
     text: "",
     hashtags: [] as string[],
     languages: defaultLangs,
@@ -110,10 +108,8 @@ const Form: React.FC<
     hasError: undefined as boolean | undefined,
   };
 
-  type FormData = typeof defaultValues;
-
   const { register, control, handleSubmit, watch, setValue } =
-    useForm<FormData>({
+    useForm<SearchFormData>({
       defaultValues,
     });
 
@@ -126,70 +122,28 @@ const Form: React.FC<
 
   const [showAdvanced, setShowAdvanced] = useState(false);
 
-  const handler = (data: FormData) => {
+  const handler = (data: SearchFormData) => {
     setShowAdvanced(false);
-    let q = "";
-    const text = data.text.trim();
 
-    // Add text search with language filters
-    if (text && data.languages?.length) {
-      q += `+(${data.languages.map((l) => `text_${l.value}:${text}`).join(" ")})`;
-    } else {
-      // ensure that there's at least one positive clause
-      q = "rkey:[* TO *]";
-    }
+    // Dispatch the action to update search params from form data
+    dispatch(updateSearchFromForm(data));
 
-    // Add hashtags
-    if (data.hashtags.length) {
-      q += ` +tag:(${data.hashtags.join(" ")})`;
-    }
+    // If the search params haven't changed but we want to refetch
+    if (params && searchResult.isSuccess) {
+      const newParams = {
+        q: "", // This will be filled by the updateSearchFromForm action
+        dids: data.dids,
+        sort: data.sort,
+        limit: 25,
+        before: data.before && new Date(data.before).toISOString(),
+        after: data.after && new Date(data.after).toISOString(),
+        debug: false,
+      };
 
-    // Add tri-state filters
-    if (data.isReply !== undefined) {
-      q += ` ${sign(data.isReply)}is:reply`;
+      if (isEqual(params, newParams)) {
+        searchResult.refetch();
+      }
     }
-    if (data.hasLabel !== undefined) {
-      q += ` ${sign(data.hasLabel)}has:label`;
-    }
-    if (data.hasTag !== undefined) {
-      q += ` ${sign(data.hasTag)}has:tag`;
-    }
-    if (data.hasEmbed !== undefined) {
-      q += ` ${sign(data.hasEmbed)}has:embed`;
-    }
-    if (data.hasError !== undefined) {
-      q += ` ${sign(data.hasError)}has:error`;
-    }
-
-    // Add label filters
-    if (data.excludeLabels.length) {
-      q += ` -label:(${data.excludeLabels
-        .map((label) => `"${label.value}"`)
-        .join(" ")})`;
-    }
-
-    if (data.includeLabels.length) {
-      q += ` +label:("${data.includeLabels.map((label) => label.value).join('" "')}")`;
-    }
-
-    // Add embed filters
-    if (data.embeds.length) {
-      q += ` embed_type:(${data.embeds.join(" ")})`;
-    }
-
-    const update = {
-      q: q.trim(),
-      dids: data.dids,
-      sort: data.sort,
-      limit: 25,
-      before: data.before && new Date(data.before).toISOString(),
-      after: data.after && new Date(data.after).toISOString(),
-      debug: false,
-    };
-    if (params && searchResult.isSuccess && isEqual(params, update)) {
-      searchResult.refetch();
-    }
-    onChange(update);
   };
 
   return (
@@ -477,19 +431,24 @@ const Form: React.FC<
   );
 };
 
-const SearchControls: React.FC<Props> = ({ params, onChange }) => {
+const SearchControls: React.FC = () => {
   const { data, isError } = useLangsQuery();
   const langs = useMemo(() => langData(data?.seen), [data?.seen]);
+  const searchParams = useAppSelector((state) => state.search.searchParams);
 
   // Wait until data is loaded before rendering form, so that defaults are initialized as expected
   if (!langs[1].length && !isError) {
     return null;
   }
 
-  return <Form params={params} onChange={onChange} langs={langs} />;
+  return (
+    <>
+      {!searchParams && <h1>Bluesky Search</h1>}{" "}
+      <Form langs={langs} params={searchParams} />
+    </>
+  );
 };
 
-const sign = (val: boolean) => (val ? "+" : "-");
 
 function langData(seen: string[] = []) {
   const defaultLangs = navigator.languages.filter((l) => seen.includes(l));
