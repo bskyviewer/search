@@ -77,6 +77,22 @@ npm test run
 
 ## Code Conventions
 
+### Code Generation
+- When generating React components, use functional components with TypeScript interfaces for props
+- Follow the existing pattern of using Redux hooks (`useAppSelector`, `useAppDispatch`) for state management
+- When writing tests, follow the Arrange-Act-Assert pattern shown in the example above
+
+### Preferred Patterns
+- Use async/await for asynchronous operations instead of Promise chains
+- Use destructuring for props and state
+- Use the Redux Toolkit's createSlice for state management
+- Use TypeScript interfaces for defining data structures
+
+### File Organization
+- New components should be placed in the `src/components` directory
+- New Redux slices should be placed in the `src/store` directory
+- Tests should be placed in `__tests__` directories adjacent to the files they test
+
 ### TypeScript Configuration
 - The project uses strict TypeScript configuration
 - Path aliases are configured to use the `src` directory as the base URL
@@ -106,21 +122,3 @@ npm test run
 - TypeScript
 - Vite
 - Vitest for testing
-
-## Copilot-Specific Guidelines
-
-### Code Generation
-- When generating React components, use functional components with TypeScript interfaces for props
-- Follow the existing pattern of using Redux hooks (`useAppSelector`, `useAppDispatch`) for state management
-- When writing tests, follow the Arrange-Act-Assert pattern shown in the example above
-
-### Preferred Patterns
-- Use async/await for asynchronous operations instead of Promise chains
-- Use destructuring for props and state
-- Use the Redux Toolkit's createSlice for state management
-- Use TypeScript interfaces for defining data structures
-
-### File Organization
-- New components should be placed in the `src/components` directory
-- New Redux slices should be placed in the `src/store` directory
-- Tests should be placed in `__tests__` directories adjacent to the files they test

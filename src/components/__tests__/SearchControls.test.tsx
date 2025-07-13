@@ -1,10 +1,19 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import { render, screen, fireEvent, waitFor, act } from "@testing-library/react";
+import {
+  render,
+  screen,
+  fireEvent,
+  waitFor,
+  act,
+} from "@testing-library/react";
 import { Provider } from "react-redux";
 import { configureStore } from "@reduxjs/toolkit";
 import SearchControls from "../SearchControls";
-import searchReducer, { updateSearchFromForm } from "../../store/searchSlice";
-import { apiSlice } from "../../store/api";
+import searchReducer, {
+  type SearchFormData,
+  updateSearchFromForm,
+} from "store/searchSlice";
+import { apiSlice } from "store/api";
 
 // Mock the API hooks
 vi.mock("../../store/api.ts", () => ({
@@ -45,7 +54,7 @@ const setupStore = (preloadedState = {}) => {
 };
 
 describe("SearchControls", () => {
-  let store;
+  let store: ReturnType<typeof setupStore>;
 
   beforeEach(() => {
     store = setupStore({
@@ -62,14 +71,16 @@ describe("SearchControls", () => {
     render(
       <Provider store={store}>
         <SearchControls />
-      </Provider>
+      </Provider>,
     );
 
     // Check that the title is rendered when no search params
     expect(screen.getByText("Bluesky Search")).toBeInTheDocument();
 
     // Check that the search input is rendered
-    expect(screen.getByPlaceholderText("Enter search terms...")).toBeInTheDocument();
+    expect(
+      screen.getByPlaceholderText("Enter search terms..."),
+    ).toBeInTheDocument();
 
     // Check that the search button is rendered
     expect(screen.getByText("Search")).toBeInTheDocument();
@@ -82,7 +93,7 @@ describe("SearchControls", () => {
     render(
       <Provider store={store}>
         <SearchControls />
-      </Provider>
+      </Provider>,
     );
 
     // Advanced options should be hidden initially
@@ -111,7 +122,7 @@ describe("SearchControls", () => {
     render(
       <Provider store={store}>
         <SearchControls />
-      </Provider>
+      </Provider>,
     );
 
     // Enter text in the search input
@@ -133,7 +144,7 @@ describe("SearchControls", () => {
           payload: expect.objectContaining({
             text: "test query",
           }),
-        })
+        }),
       );
     });
   });
@@ -142,7 +153,7 @@ describe("SearchControls", () => {
     render(
       <Provider store={store}>
         <SearchControls />
-      </Provider>
+      </Provider>,
     );
 
     // Open advanced options
@@ -155,7 +166,7 @@ describe("SearchControls", () => {
     const isReplyToggle = isReplyLabel.parentElement;
 
     // Find the Yes button within the toggle
-    const yesButton = isReplyToggle.querySelector("button:nth-child(1)");
+    const yesButton = isReplyToggle!.querySelector("button:nth-child(1)")!;
 
     // Click the Yes button
     await act(async () => {
@@ -177,7 +188,7 @@ describe("SearchControls", () => {
           payload: expect.objectContaining({
             isReply: true,
           }),
-        })
+        }),
       );
     });
   });
@@ -186,7 +197,7 @@ describe("SearchControls", () => {
     render(
       <Provider store={store}>
         <SearchControls />
-      </Provider>
+      </Provider>,
     );
 
     // Open advanced options
@@ -206,7 +217,7 @@ describe("SearchControls", () => {
     render(
       <Provider store={store}>
         <SearchControls />
-      </Provider>
+      </Provider>,
     );
 
     // Open advanced options
@@ -220,8 +231,12 @@ describe("SearchControls", () => {
 
     // Enter dates
     await act(async () => {
-      fireEvent.change(afterDateInput, { target: { value: "2023-01-01T00:00" } });
-      fireEvent.change(beforeDateInput, { target: { value: "2023-12-31T23:59" } });
+      fireEvent.change(afterDateInput, {
+        target: { value: "2023-01-01T00:00" },
+      });
+      fireEvent.change(beforeDateInput, {
+        target: { value: "2023-12-31T23:59" },
+      });
     });
 
     // Submit the form
@@ -237,8 +252,71 @@ describe("SearchControls", () => {
             after: "2023-01-01T00:00",
             before: "2023-12-31T23:59",
           }),
-        })
+        }),
       );
     });
+  });
+
+  it("correctly processes hashtag searches", () => {
+    // Create a separate test file for testing the search slice directly
+    const initialState = { searchParams: null };
+
+    // Test searching for the hashtag :emoji:
+    const emojiFormData: SearchFormData = {
+      text: "",
+      hashtags: [":emoji:"],
+      languages: [],
+      sort: "desc",
+      dids: [],
+      before: undefined,
+      after: undefined,
+      excludeLabels: [],
+      includeLabels: [],
+      embeds: [],
+      isReply: undefined,
+      hasLabel: undefined,
+      hasTag: undefined,
+      hasEmbed: undefined,
+      hasError: undefined,
+    };
+
+    // Call the reducer directly
+    const emojiState = searchReducer(
+      initialState,
+      updateSearchFromForm(emojiFormData),
+    );
+
+    // Verify the state was updated correctly
+    expect(emojiState.searchParams).not.toBeNull();
+    expect(emojiState.searchParams?.q).toContain("+tag:(:emoji:)");
+
+    // Test searching for the hashtag Games
+    const gamesFormData: SearchFormData = {
+      text: "",
+      hashtags: ["Games"],
+      languages: [],
+      sort: "desc",
+      dids: [],
+      before: undefined,
+      after: undefined,
+      excludeLabels: [],
+      includeLabels: [],
+      embeds: [],
+      isReply: undefined,
+      hasLabel: undefined,
+      hasTag: undefined,
+      hasEmbed: undefined,
+      hasError: undefined,
+    };
+
+    // Call the reducer directly
+    const gamesState = searchReducer(
+      initialState,
+      updateSearchFromForm(gamesFormData),
+    );
+
+    // Verify the state was updated correctly
+    expect(gamesState.searchParams).not.toBeNull();
+    expect(gamesState.searchParams?.q).toContain("+tag:(Games)");
   });
 });
